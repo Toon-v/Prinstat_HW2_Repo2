@@ -69,7 +69,7 @@ for(i in 1:nsim)
 }
 # Monte-Carlo approximation of the power
 # for alpha = .05
-output <- append(output, list(t3_distribution=c(mean(p.t<0.5), mean(p.wmw<0.05), mean(p.med<0.05))))
+output <- append(output, list(t3_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 
 ######################################################################
 # Question 3
@@ -88,7 +88,7 @@ for (i in 1:nsim) {    # Or: replicate(N, { })
   p.med[i] <- median.test.two_sided(Y1, Y2)
 }
 mean(p.wmw<0.05)
-output <- append(output, list(exp_distribution=c(mean(p.t<0.5), mean(p.wmw<0.05), mean(p.med<0.05))))
+output <- append(output, list(exp_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 
 
 #Laplace distribution
@@ -106,7 +106,7 @@ for(i in 1:nsim)
   p.wmw[i] <- wilcox.test(Y1,Y2)$p.value
   p.med[i] <- median.test.two_sided(Y1, Y2)
 }
-output <- append(output, list(laplace_distribution=c(mean(p.t<0.5), mean(p.wmw<0.05), mean(p.med<0.05))))
+output <- append(output, list(laplace_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 
 #t5 distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -123,7 +123,7 @@ for(i in 1:nsim)
   p.wmw[i] <- wilcox.test(Y1,Y2)$p.value
   p.med[i] <- median.test.two_sided(Y1, Y2)
 }
-output <- append(output, list(t5_distribution=c(mean(p.t<0.5), mean(p.wmw<0.05), mean(p.med<0.05))))
+output <- append(output, list(t5_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 
 #Logistic distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -140,7 +140,7 @@ for(i in 1:nsim)
   p.wmw[i] <- wilcox.test(Y1,Y2)$p.value
   p.med[i] <- median.test.two_sided(Y1, Y2)
 }
-output <- append(output, list(logistic_distribution=c(mean(p.t<0.5), mean(p.wmw<0.05), mean(p.med<0.05))))
+output <- append(output, list(logistic_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 
 #normal distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -157,7 +157,7 @@ for(i in 1:nsim)
   p.wmw[i] <- wilcox.test(Y1,Y2)$p.value
   p.med[i] <- median.test.two_sided(Y1, Y2)
 }
-output <- append(output, list(normal_distribution=c(mean(p.t<0.5), mean(p.wmw<0.05), mean(p.med<0.05))))
+output <- append(output, list(normal_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 
 #uniform distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -174,7 +174,7 @@ for(i in 1:nsim)
   p.wmw[i] <- wilcox.test(Y1,Y2)$p.value
   p.med[i] <- median.test.two_sided(Y1, Y2)
 }
-output <- append(output, list(uniform_distribution=c(mean(p.t<0.5), mean(p.wmw<0.05), mean(p.med<0.05))))
+output <- append(output, list(uniform_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 
 output
 
@@ -183,7 +183,7 @@ output
 distributions <- rep(names(output), each=3)
 tests <- rep(c("permutation t" , "wilcox" , "median") , 7)
 power <- unlist(output)
-data <- data.frame(distributions,tests,value)
+data <- data.frame(distributions,tests,power)
 
 # Grouped
 ggplot(data, aes(fill=tests, y=power, x=distributions)) + 
@@ -212,7 +212,7 @@ for(i in 1:nsim)
   p.med[i] <- median.test.two_sided(Y1, Y2)
 }
 # for alpha = .05
-output2 <- append(output2, list(t3_distribution=c(mean(p.t<0.5), mean(p.wmw<0.05), mean(p.med<0.05))))
+output2 <- append(output2, list(t3_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 
 
 #Exponential distribution
@@ -229,7 +229,7 @@ for (i in 1:nsim) {    # Or: replicate(N, { })
   p.med[i] <- median.test.two_sided(Y1, Y2)
 }
 mean(p.wmw<0.05)
-output2 <- append(output2, list(exp_distribution=c(mean(p.t<0.5), mean(p.wmw<0.05), mean(p.med<0.05))))
+output2 <- append(output2, list(exp_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 
 
 #Laplace distribution
@@ -247,7 +247,7 @@ for(i in 1:nsim)
   p.wmw[i] <- wilcox.test(Y1,Y2)$p.value
   p.med[i] <- median.test.two_sided(Y1, Y2)
 }
-output2 <- append(output2, list(laplace_distribution=c(mean(p.t<0.5), mean(p.wmw<0.05), mean(p.med<0.05))))
+output2 <- append(output2, list(laplace_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 
 #t5 distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -264,7 +264,7 @@ for(i in 1:nsim)
   p.wmw[i] <- wilcox.test(Y1,Y2)$p.value
   p.med[i] <- median.test.two_sided(Y1, Y2)
 }
-output2 <- append(output2, list(t5_distribution=c(mean(p.t<0.5), mean(p.wmw<0.05), mean(p.med<0.05))))
+output2 <- append(output2, list(t5_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 
 #Logistic distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -281,7 +281,7 @@ for(i in 1:nsim)
   p.wmw[i] <- wilcox.test(Y1,Y2)$p.value
   p.med[i] <- median.test.two_sided(Y1, Y2)
 }
-output2 <- append(output2, list(logistic_distribution=c(mean(p.t<0.5), mean(p.wmw<0.05), mean(p.med<0.05))))
+output2 <- append(output2, list(logistic_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 
 #normal distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -298,7 +298,7 @@ for(i in 1:nsim)
   p.wmw[i] <- wilcox.test(Y1,Y2)$p.value
   p.med[i] <- median.test.two_sided(Y1, Y2)
 }
-output2 <- append(output2, list(normal_distribution=c(mean(p.t<0.5), mean(p.wmw<0.05), mean(p.med<0.05))))
+output2 <- append(output2, list(normal_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 
 #uniform distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -315,7 +315,7 @@ for(i in 1:nsim)
   p.wmw[i] <- wilcox.test(Y1,Y2)$p.value
   p.med[i] <- median.test.two_sided(Y1, Y2)
 }
-output2 <- append(output2, list(uniform_distribution=c(mean(p.t<0.5), mean(p.wmw<0.05), mean(p.med<0.05))))
+output2 <- append(output2, list(uniform_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 
 output2
 library(MKinfer)
@@ -324,9 +324,9 @@ perm.t.test(Y~X, R=1000)$p.value
 # create a dataset
 distributions <- rep(names(output2), each=3)
 tests <- rep(c("permutation t" , "wilcox" , "median") , 7)
-power <- unlist(output2)
-data <- data.frame(distributions,tests,value)
+type1 <- unlist(output2)
+data <- data.frame(distributions,tests,type1)
 
 # Grouped
-ggplot(data, aes(fill=tests, y=power, x=distributions)) + 
+ggplot(data, aes(fill=tests, y=type1, x=distributions)) + 
   geom_bar(position="dodge", stat="identity") + coord_flip()
