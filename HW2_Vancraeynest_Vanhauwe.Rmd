@@ -259,6 +259,8 @@ ggplot(data, aes(fill=tests, y=power, x=distributions)) +
   geom_bar(position="dodge", stat="identity") + coord_flip()
 ```
 
+For most distributions we that the Wilcoxon-Mann-Whitney test and our test based on the medians have a similar performance when comparing the power of the tests. For most almost all distributions these test perform better than the permutation t test when comparing the power. One notable exception is for the power of the uniform distribution. It seems that the test based on medians is not well suited for this distribution.
+
 ## Type I error rate of tests for different distributions
 
 ```{r, typeI_t3, cache=TRUE}
@@ -424,6 +426,8 @@ data <- data.frame(distributions,tests,typeI)
 ggplot(data, aes(fill=tests, y=typeI, x=distributions)) + 
   geom_bar(position="dodge", stat="identity") + geom_hline(yintercept = 0.05, color = "red", linetype = "dashed", linewidth = 1) + coord_flip()
 ```
+
+We can see that the type I error rate is for all tests approximately controlled at $\alpha = 0.05$. We see that the test based on medians is less conservative than the Wilcoxon-Mann-Whitney test and the permutation t test, except for the case of the uniform distribution. In the case of the logistic and exponential distribution the type I error rate for the test based on medians is slightly bigger than the desired 0.05.
 
 ## Appendix
 
