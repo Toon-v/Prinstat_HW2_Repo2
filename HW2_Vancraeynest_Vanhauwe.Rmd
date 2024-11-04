@@ -244,7 +244,11 @@ output <- append(output, list(uniform_distribution=c(mean(p.t<0.05), mean(p.wmw<
 ```
 
 ```{r}
-# create a dataset from this list
+#Dataframe from closer inspection
+df <- data.frame(output)
+rownames(df) <- c("permutation t", "wilcox", "median")
+
+#Dataset for plotting
 distributions <- rep(c("t3", "Exponential", "Laplace", "t5", "Logistic", "Normal", "Uniform"), each=3) #
 tests <- rep(c("permutation t" , "wilcox" , "median") , 7)
 power <- unlist(output)
@@ -403,7 +407,11 @@ output2 <- append(output2, list(uniform_distribution=c(mean(p.t<0.05), mean(p.wm
 ```
 
 ```{r}
-# create a dataset from this list
+#Dataframe from closer inspection
+df2 <- data.frame(output2)
+rownames(df2) <- c("permutation t", "wilcox", "median")
+
+#Dataset for plotting
 #Names of the distributions
 distributions <- rep(c("t3", "Exponential", "Laplace", "t5", "Logistic", "Normal", "Uniform"), each=3)
 #Names of the tests

@@ -358,8 +358,17 @@ display: none;
 
 
 <pre><code>## Loading required package: survival</code></pre>
-<div id="q1" class="section level2">
-<h2>Q1</h2>
+<div id="question-1" class="section level2">
+<h2>Question 1</h2>
+<p>We consider the following hypotheses:</p>
+<p><span class="math display">\[ H_0 : F_1 = F_2 \]</span></p>
+<p>against</p>
+<p><span class="math display">\[ H_A : median_1 \neq median_2
+\]</span></p>
+<p>The sample median was chosen as the test-statistic. The code for this
+test calculates the exact permutation null distribution if the number of
+permutations is less than 500. Otherwise, the permutaiton null
+distribution is approximated:</p>
 <pre class="r"><code>#Code written by Toon
 median.test.two_sided &lt;- function(vec1, vec2, N=1000, exact=FALSE) {
   # Calculate observed test statistic
@@ -401,8 +410,8 @@ median.test.two_sided &lt;- function(vec1, vec2, N=1000, exact=FALSE) {
   p_value
 }</code></pre>
 </div>
-<div id="q2" class="section level2">
-<h2>Q2</h2>
+<div id="question-2" class="section level2">
+<h2>Question 2</h2>
 <pre class="r"><code>#Code written by Toon
 set.seed(100) #For reproductibility
 nsim &lt;- 500
@@ -428,8 +437,12 @@ for(i in 1:nsim)
 }
 # Monte-Carlo approximation of the power
 # for alpha = .05
-c(mean(p.t&lt;0.05), mean(p.wmw&lt;0.05), mean(p.med&lt;0.05))</code></pre>
-<pre><code>## [1] 0.452 0.538 0.556</code></pre>
+# Assume p.t, p.wmw, and p.med are already defined in your code.
+results &lt;- data.frame(n = n,
+  t_test_power = mean(p.t &lt; 0.05),
+  wmw_test_power = mean(p.wmw &lt; 0.05),
+  med_test_power = mean(p.med &lt; 0.05)
+)</code></pre>
 </div>
 <div id="power-of-tests-for-different-distributions" class="section level2">
 <h2>Power of tests for different distributions</h2>
@@ -579,7 +592,7 @@ for(i in 1:nsim)
   #median test
   p.med[i] &lt;- median.test.two_sided(Y1, Y2)
 }
-# Monte-Carlo approximation of the power
+# Monte-Carlo approximation of Type I error rate
 # for alpha = .05
 #append Type I error rate for t3 distribution
 output2 &lt;- append(output2, list(t3_distribution=c(mean(p.t&lt;0.05), mean(p.wmw&lt;0.05), mean(p.med&lt;0.05))))
