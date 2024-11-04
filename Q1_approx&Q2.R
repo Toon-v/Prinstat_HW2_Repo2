@@ -330,3 +330,5 @@ data <- data.frame(distributions,tests,type1)
 # Grouped
 ggplot(data, aes(fill=tests, y=type1, x=distributions)) + 
   geom_bar(position="dodge", stat="identity") + coord_flip()
+
+
