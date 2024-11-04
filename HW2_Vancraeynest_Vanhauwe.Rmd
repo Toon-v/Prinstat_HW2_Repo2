@@ -15,7 +15,18 @@ library(extraDistr) #Laplace distribution
 library(ggplot2) #Plotting barplots
 ```
 
-## Q1
+## Question 1 
+
+We consider the following hypotheses:
+
+$$ H_0 : F_1 = F_2 $$
+
+against
+
+$$ H_A : median_1 \neq median_2 $$
+
+The sample median was chosen as the test-statistic. The code for this test calculates the exact permutation null distribution if the number of permutations is less than 500. Otherwise, the permutaiton null distribution is approximated:
+
 ```{r, echo=TRUE}
 #Code written by Toon
 median.test.two_sided <- function(vec1, vec2, N=1000, exact=FALSE) {
@@ -59,7 +70,7 @@ median.test.two_sided <- function(vec1, vec2, N=1000, exact=FALSE) {
 }
 ```
 
-## Q2
+## Question 2
 
 ```{r, include=TRUE, cache=TRUE, echo=TRUE}
 #Code written by Toon
@@ -87,7 +98,13 @@ for(i in 1:nsim)
 }
 # Monte-Carlo approximation of the power
 # for alpha = .05
-c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))
+# Assume p.t, p.wmw, and p.med are already defined in your code.
+results <- data.frame(n = n,
+  t_test_power = mean(p.t < 0.05),
+  wmw_test_power = mean(p.wmw < 0.05),
+  med_test_power = mean(p.med < 0.05)
+)
+
 ```
 
 ## Power of tests for different distributions
@@ -118,6 +135,7 @@ for (i in 1:nsim) {
 #Append power of test for exponential distribution
 output <- append(output, list(exp_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 ```
+
 ```{r, power_laplace, cache=TRUE}
 #Laplace distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -138,6 +156,7 @@ for(i in 1:nsim)
 #Append power of test for laplace distribution
 output <- append(output, list(laplace_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 ```
+
 ```{r, power_t5, cache=TRUE}
 #t5 distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -160,6 +179,7 @@ for(i in 1:nsim)
 #Append power of test for t5 distribution
 output <- append(output, list(t5_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 ```
+
 ```{r, power_logistic, cache=TRUE}
 #Logistic distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -180,6 +200,7 @@ for(i in 1:nsim)
 #Append power of test for logistic distribution
 output <- append(output, list(logistic_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 ```
+
 ```{r, power_normal, cache=TRUE}
 #normal distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -200,6 +221,7 @@ for(i in 1:nsim)
 #Append power of test for normal distribution
 output <- append(output, list(normal_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 ```
+
 ```{r, power_uniform, cache=TRUE}
 #uniform distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -220,6 +242,7 @@ for(i in 1:nsim)
 #Append power test for uniform distribution
 output <- append(output, list(uniform_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 ```
+
 ```{r}
 # create a dataset from this list
 distributions <- rep(c("t3", "Exponential", "Laplace", "t5", "Logistic", "Normal", "Uniform"), each=3) #
@@ -233,6 +256,7 @@ ggplot(data, aes(fill=tests, y=power, x=distributions)) +
 ```
 
 ## Type I error rate of tests for different distributions
+
 ```{r, typeI_t3, cache=TRUE}
 set.seed(100)
 nsim <- 500
@@ -256,7 +280,7 @@ for(i in 1:nsim)
   #median test
   p.med[i] <- median.test.two_sided(Y1, Y2)
 }
-# Monte-Carlo approximation of the power
+# Monte-Carlo approximation of Type I error rate
 # for alpha = .05
 #append Type I error rate for t3 distribution
 output2 <- append(output2, list(t3_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
@@ -280,6 +304,7 @@ for (i in 1:nsim) {
 #Append Type I error rate for exponential distribution
 output2 <- append(output2, list(exp_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 ```
+
 ```{r, typeI_laplace, cache=TRUE}
 #Laplace distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -299,6 +324,7 @@ for(i in 1:nsim)
 #Append Type I error rate for laplace distribution
 output2 <- append(output2, list(laplace_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 ```
+
 ```{r, typeI_t5, cache=TRUE}
 #t5 distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -318,6 +344,7 @@ for(i in 1:nsim)
 #Append Type I error rate for t5 distribution
 output2 <- append(output2, list(t5_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 ```
+
 ```{r, typeI_logistic, cache=TRUE}
 #Logistic distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -336,6 +363,7 @@ for(i in 1:nsim)
 #Append Type I error rate for logistic distribution
 output2 <- append(output2, list(logistic_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 ```
+
 ```{r, typeI_normal, cache=TRUE}
 #normal distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -354,6 +382,7 @@ for(i in 1:nsim)
 #Append Type I error rate for normal distribution
 output2 <- append(output2, list(normal_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 ```
+
 ```{r, typeI_uniform, cache=TRUE}
 #uniform distribution
 p.t <- p.wmw <- p.med <- numeric(nsim)
@@ -372,6 +401,7 @@ for(i in 1:nsim)
 #Append Type I error rate for uniform distribution
 output2 <- append(output2, list(uniform_distribution=c(mean(p.t<0.05), mean(p.wmw<0.05), mean(p.med<0.05))))
 ```
+
 ```{r}
 # create a dataset from this list
 #Names of the distributions
@@ -395,9 +425,3 @@ labs = c("power_exponential", "power_laplace", "power_t5", "power_logistic", "po
 
 ```{r allcode, ref.label = labs, echo=TRUE, eval = FALSE}
 ```
-
-
-
-
-
-
