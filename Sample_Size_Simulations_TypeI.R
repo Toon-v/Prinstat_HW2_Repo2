@@ -52,7 +52,6 @@ median.test.two_sided <- function(vec1, vec2, N=1000, exact=FALSE) {
 set.seed(100) #For reproductibility
 nsim <- 500
 #t3 distribution
-delta <- sqrt(3)/2 #delta = sqrt(variance)/2
 p.t <- p.wmw <- p.med <- numeric(nsim) #empty vector of p values for each test
 
 
@@ -72,7 +71,7 @@ for (j in 1:length(sample_sizes)) {
   for(i in 1:nsim)
   {
     Y1 <- rt(n, 3)
-    Y2 <- rt(n, 3) + delta
+    Y2 <- rt(n, 3)
     X <- factor(c(rep("A",n),rep("B",n)))
     Y <- c(Y1, Y2)
     #permutation t-test
@@ -89,7 +88,7 @@ for (j in 1:length(sample_sizes)) {
   results_t3$wmw_test_power[j] <- mean(p.wmw < 0.05)
   results_t3$med_test_power[j] <- mean(p.med < 0.05)
 }
-  
+
 
 
 #----------------------------------------------------------------------------------------------
@@ -103,13 +102,11 @@ results_exp <- data.frame(
   med_test_power = numeric(n_sample_sizes)
 )
 
-#variance = 1/rate**2
-delta <- sqrt(1)/2 #delta = sqrt(variance)/2
 for (j in 1:length(sample_sizes)) {
   n <- sample_sizes[j]
   for (i in 1:nsim) {
     Y1 <- rexp(n, rate = 1)
-    Y2 <- rexp(n, rate = 1)+delta
+    Y2 <- rexp(n, rate = 1)
     X <- factor(c(rep("A",n),rep("B",n)))
     Y <- c(Y1, Y2)
     
@@ -136,14 +133,13 @@ results_lap <- data.frame(
   wmw_test_power = numeric(n_sample_sizes),
   med_test_power = numeric(n_sample_sizes)
 )
-# variance = 2*sigma**2
-delta <- sqrt(2)/2 #delta = sqrt(variance)/2
+
 
 for (j in 1:length(sample_sizes)) {
   n <- sample_sizes[j]
   for(i in 1:nsim){
     Y1 <- rlaplace(n, mu = 0, sigma = 1)
-    Y2 <- rlaplace(n, mu = delta, sigma = 1)
+    Y2 <- rlaplace(n, mu = 0, sigma = 1)
     X <- factor(c(rep("A",n),rep("B",n)))
     Y <- c(Y1, Y2)
     #permutation t-test
@@ -168,16 +164,13 @@ results_t5 <- data.frame(
   med_test_power = numeric(n_sample_sizes)
 )
 
-#variance t-distribution = dof/(dof-2)
-#with dof the degrees of freedom
-delta <- sqrt(5/3)/2 #delta = sqrt(variance)/2
 
 for (j in 1:length(sample_sizes)) {
   n <- sample_sizes[j]
   for(i in 1:nsim)
   {
     Y1 <- rt(n, 5)
-    Y2 <- rt(n, 5) + delta
+    Y2 <- rt(n, 5)
     X <- factor(c(rep("A",n),rep("B",n)))
     Y <- c(Y1, Y2)
     #permutation t-test
@@ -203,14 +196,12 @@ results_log <- data.frame(
   med_test_power = numeric(n_sample_sizes)
 )
 
-#variance = scale**2 * pi**2 / 3 
-delta <- sqrt(pi**2/3)/2 #delta = sqrt(variance)/2
 for (j in 1:length(sample_sizes)) {
   n <- sample_sizes[j]
   for(i in 1:nsim)
   {
     Y1 <- rlogis(n, location=0, scale=1)
-    Y2 <- rlogis(n, location = delta, scale=1)
+    Y2 <- rlogis(n, location=0, scale=1)
     X <- factor(c(rep("A",n),rep("B",n)))
     Y <- c(Y1, Y2)
     #permutation t-test
@@ -236,14 +227,13 @@ results_norm <- data.frame(
   wmw_test_power = numeric(n_sample_sizes),
   med_test_power = numeric(n_sample_sizes)
 )
-#variance = sqrt(sigma)
-delta <- sqrt(1)/2 #delta = sqrt(variance)/2
+
 for (j in 1:length(sample_sizes)) {
   n <- sample_sizes[j]
   for(i in 1:nsim)
   {
     Y1 <- rnorm(n, 0, 1)
-    Y2 <- rnorm(n, delta, 1)
+    Y2 <- rnorm(n, 0, 1)
     X <- factor(c(rep("A",n),rep("B",n)))
     Y <- c(Y1, Y2)
     #permutation t-test
@@ -267,15 +257,14 @@ results_unif <- data.frame(
   wmw_test_power = numeric(n_sample_sizes),
   med_test_power = numeric(n_sample_sizes)
 )
-#variance = 1/12 * (max-min)**2
-delta <- sqrt(1/12)/2 #delta = sqrt(variance)/2
+
 for (j in 1:length(sample_sizes)) {
   n <- sample_sizes[j]
-    
+  
   for(i in 1:nsim)
   {
     Y1 <- runif(n, min=0, max=1)
-    Y2 <- runif(n, min=0, max=1)+delta
+    Y2 <- runif(n, min=0, max=1)
     X <- factor(c(rep("A",n),rep("B",n)))
     Y <- c(Y1, Y2)
     #permutation t-test
@@ -285,31 +274,21 @@ for (j in 1:length(sample_sizes)) {
     p.med[i] <- median.test.two_sided(Y1, Y2)
   }
   results_unif$t_test_power[j] <- mean(p.t < 0.05)
-  results_unif$wmw_test_power[j] <- mean(p.wmw < 0.05)
+  results_unif$wmw_test_power[j] <- mean(p.wmw < 0.05) 
   results_unif$med_test_power[j] <- mean(p.med < 0.05)
 }
 
 # Save files
-save(results_unif, file = "results_unif.RData")
-save(results_exp, file = "results_exp.RData")
-save(results_t3, file = "results_t3.RData")
-save(results_t5, file = "results_t5.RData")
-save(results_lap, file = "results_lap.RData")
-save(results_log, file = "results_log.RData")
-save(results_norm, file = "results_norm.RData")
+save(results_unif, file = "results_unif_TypeI.RData")
+save(results_exp, file = "results_exp_TypeI.RData")
+save(results_t3, file = "results_t3_TypeI.RData")
+save(results_t5, file = "results_t5_TypeI.RData")
+save(results_lap, file = "results_lap_TypeI.RData")
+save(results_log, file = "results_log_TypeI.RData")
+save(results_norm, file = "results_norm_TypeI.RData")
 
 
-rm(list=ls())
-# Load each dataset
-load("results_unif.RData")
-load("results_exp.RData")
-load("results_t3.RData")
-load("results_t5.RData")
-load("results_lap.RData")
-load("results_log.RData")
-load("results_norm.RData")
-
-# Add distribution column
+# combine
 results_unif$distribution <- "uniform"
 results_exp$distribution <- "exponential"
 results_t3$distribution <- "t with dof 3"
@@ -318,8 +297,7 @@ results_lap$distribution <- "laplace"
 results_log$distribution <- "lognormal"
 results_norm$distribution <- "normal"
 
-# Combine all datasets into one
-results_Power <- rbind(
+results_TypeI <- rbind(
   results_unif,
   results_exp,
   results_t3,
@@ -329,6 +307,5 @@ results_Power <- rbind(
   results_norm
 )
 
-# Save the combined dataset
-save(results_Power, file = "results_Power.RData")
+save(results_TypeI, file = "results_TypeI.RData")
 
