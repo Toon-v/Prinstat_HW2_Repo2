@@ -1,40 +1,25 @@
----
-title: "HW2_Vancraeynest_Vanhauwe"
-author: "Toon Vancraeynest, Jonas Vanhauwe"
-date: "`r Sys.Date()`"
-output: pdf_document
----
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-```
 
-```{r , include = FALSE}
+#_____________________________________________________________________________
+# Code supplementary to HW2 Vancraeynest Vanhauwe
+
+#_____________________________________________________________________________
+
+# read library
 library(coin)
 library(extraDistr) #Laplace distribution
 library(ggplot2) #Plotting barplots
 library(tidyverse)
-```
 
-## Question 1: Construction of median test based on permutation strategy
+#_____________________________________________________________________________
 
-We consider the following hypotheses:
-
-$$ H_0 : F_1 = F_2 $$
-
-against
-
-$$ H_A : median_1 \neq median_2 $$
-
-The sample median was chosen as the test-statistic. As required, the test follows a permutation strategy to determine the p-value. The code for this test calculates the exact permutation null distribution if the number of permutations is less than 500. Otherwise, the permutation null distribution is approximated:
-
-```{r, echo=TRUE}
+# Question 1
 
 median.test.two_sided <- function(vec1, vec2, N=1000, exact=FALSE) {
   
   observed_test_statistic <- abs(median(vec1) - median(vec2))
   
-
+  
   full_vec <- c(vec1, vec2)
   
   # Check if the number of combinations is less than N - default N = 1000
@@ -49,7 +34,7 @@ median.test.two_sided <- function(vec1, vec2, N=1000, exact=FALSE) {
     })
   } else {
     
-
+    
     # Approximate null distribution by permutation if combinations exceed N
     Groupvec <- c(rep(1, length(vec1)), 
                   rep(2, length(vec2)))  # Create group vector
@@ -71,69 +56,10 @@ median.test.two_sided <- function(vec1, vec2, N=1000, exact=FALSE) {
   
   p_value
 }
-```
 
-## Question 2: Power simulation set-up
+#_____________________________________________________________________________
 
-Following the required set-up, we compare the power of our newly developed median test based on a permutation strategy with the permutation t-test and the Wilcoxon-Mann-Whitney test using simulations. The power can be expressed as $P(\text{Reject } H_0 \mid H_a \text{ is true})$ . Therefore, we can count the proportion of times that the test rejects $H_0$. In other words, we set up the simulation under $H_a$ and count the proportion of times that the p-value is smaller than the significance level $\alpha = 0.05$ . Note that in this comparison, we assume that the location shift model holds, since in this case, there is a relationship between the alternative hypothesis of the Mann-Whitney-U test and the (permutation) t-test. In Appendix 1, we show the Q-Q Plots used to verify whether this assumption holds for all distributions considered when the sample size is 20. If the data are parallel to the diagonal, the location shift model holds, because this means that the quantile function of the first and second group are the same in shape, but shifted with delta.
-
-The comparison of the Mann-Whitney-U test, the permutation t-test and the developed median test is especially important for symmetrical distributions, because for symmetrical distributions, the mean equals the median, meaning that we have the following relationships:
-
-$$
-P(X_1 < X_2) = \frac{1}{2} \quad \Leftrightarrow \quad \mu_1 = \mu_2 \quad \Leftrightarrow \quad median_1 = median_2
-$$
-
-$$
-P(X_1 < X_2) > \frac{1}{2} \quad \Leftrightarrow \quad \mu_1 < \mu_2 \quad \Leftrightarrow \quad median_1 < median_2
-$$
-
-$$
-P(X_1 < X_2) < \frac{1}{2} \quad \Leftrightarrow \quad \mu_1 > \mu_2 \quad \Leftrightarrow \quad median_1 > median_2
-$$
-
-By running this simulation for 8 distributions and 5 sample sizes (5, 10, 20, 50 and 100), we obtain a comprehensive view on the performance of the tests. The delta was always chosen as proposed in the course notes: $\delta = \frac{\sqrt{\text{variance}}}{2}$ This is a good choice because it did not result in a power of 0% or 100% for the distributions and sample sizes considered.
-
-From the QQ-Plots in Appendix 1, we infer that the location shift model does clearly not hold for the uniform distribution. We will take this into account in the remainder of our analysis when drawing conclusions. For the Logistic distribution and the Exponential distribution, the location shift relationship is not as explicit as for the other distributions - t3, laplace, t5 and normal - but we cannot clearly state that the location shift model does not hold.
-
-To contain the required computation time, we chose to run 500 simulations per combination of distribution and sample size. The results are summarized in Appendix 2. Generally, we observe that for all tests, the power increases substantially with the sample size, which is expected. Further discussion will be provided in answering Question 3. Finally, we present the code used for the simulation of the t-distribution with 3 degrees of freedom at sample size 20. The code for all simulations can be found in the R-File attached.
-
-```{r, include=TRUE, cache=TRUE, echo=TRUE}
-
-set.seed(1234) #For reproductibility
-nsim <- 500
-p.t <- p.wmw <- p.med <- numeric(nsim) #empty vector of p values for each test
-n <- 20 # n observations in each group
-#variance t-distribution = dof/(dof-2)
-#with dof the degrees of freedom
-delta <- sqrt(3)/2 #delta = sqrt(variance)/2
-for(i in 1:nsim)
-{
-  Y1 <- rt(n, 3)
-  Y2 <- rt(n, 3) + delta
-  X <- factor(c(rep("A",n),rep("B",n)))
-  Y <- c(Y1, Y2)
-  #permutation t-test
-  p.t[i] <- pvalue(oneway_test(Y ~ X,
-                               distribution=approximate(nresample=1000)))
-  #Wilcoxon-Mann-Whitney test
-  p.wmw[i] <- wilcox.test(Y1,Y2)$p.value
-  #median test
-  p.med[i] <- median.test.two_sided(Y1, Y2)
-}
-# Monte-Carlo approximation of the power
-# for alpha = .05
-results <- data.frame(n = n,
-  t_test_power = mean(p.t < 0.05),
-  wmw_test_power = mean(p.wmw < 0.05),
-  med_test_power = mean(p.med < 0.05)
-)
-
-```
-
-## Question 3: Power tests for different distributions
-
-```{r, power_simulation, cache=TRUE}
-
+# Question 2
 
 #----------------------------------------------------------------------------------
 
@@ -181,7 +107,7 @@ for (j in 1:length(sample_sizes)) {
   results_t3$wmw_test_power[j] <- mean(p.wmw < 0.05)
   results_t3$med_test_power[j] <- mean(p.med < 0.05)
 }
-  
+
 
 
 #----------------------------------------------------------------------------------
@@ -375,7 +301,7 @@ results_unif <- data.frame(
 delta <- sqrt(1/12)/2 #delta = sqrt(variance)/2
 for (j in 1:length(sample_sizes)) {
   n <- sample_sizes[j]
-    
+  
   for(i in 1:nsim)
   {
     Y1 <- runif(n, min=0, max=1)
@@ -412,9 +338,11 @@ results_Power <- rbind(
   results_log,
   results_norm
 )
-```
 
-```{r}
+#_____________________________________________________________________________
+
+# Question 3
+
 Power_n20 <- results_Power %>% filter(sample_size == 20)
 
 long_Power_n20 <- Power_n20 %>%
@@ -430,21 +358,10 @@ ggplot(long_Power_n20, aes(x = distribution, y = power, fill = test_type)) +
        fill = "Test Type") +
   coord_flip() + 
   theme_minimal()
-```
 
-At a sample size of 20, we observe that the Wilcoxon-Mann-Whitney test and our test based on the medians have a similar performance when comparing the power of the tests. When the data follows a normal distribution, a logistic distribution or a t distribution with 5 degrees of freedom, there is little that separates the three tests in terms of power with a sample size of 20. For the Laplace distribution, Exponential distribution and t distribution with 3 degrees of freedom, the permutation t-test has a substantially lower power with a sample size of 20. One notable observation is for the power of the uniform distribution. It seems that the test based on medians is not well suited for this distribution. However, for the uniform distribution, we want to refrain from making conclusions as the location shift model does not hold.
+#_____________________________________________________________________________
 
-Interestingly, if we increase the sample size to 100, the Wilcoxon-Mann-Whitney test and the permutation t-test significantly outperform the median test for the normal distribution. This effect is not seen for other distributions.
-
-## Question 4: Type I error rate of tests for different distributions
-
-A type I error is defined as the error where $H_0$ is rejected, given that $H_0$ is in fact true. The probability of making a type I error rate is controlled by the researcher at the significance level. In other words, $P(\text{Reject } H_0 \mid H_a \text{ is true}) = \alpha$ . We can verify whether the Type I error rate is controlled by simulating under the null hypothesis that both groups are drawn from the same distribution:
-
-$$ H_0 : F_1 = F_2 $$
-
-After drawing two groups from the same distribution, thereby working under the assumption that $H_0$ holds, we can calculate the Type I error rate as the proportion of times $H_0$ is rejected in a simulation study. We perform this simulation study for the same distributions and the same sample sizes as the power simulation.
-
-```{r, TypeI_simulation, cache=TRUE}
+# Question 4
 
 # set-up for Type I error rate simulation
 
@@ -711,10 +628,6 @@ results_TypeI <- rbind(
   results_norm
 )
 
-```
-
-```{r}
-
 TypeI_n20 <- results_TypeI %>% filter(sample_size == 20)
 
 long_TypeI_n20 <- TypeI_n20 %>%
@@ -735,30 +648,12 @@ ggplot(long_TypeI_n20, aes(x = distribution, y = Type_I, fill = test_type)) +
              linewidth = 1) +
   theme_minimal()
 
-```
 
-We can see that the type I error rate is for all tests approximately controlled at $\alpha = 0.05$. We see that the test based on medians is less conservative than the Wilcoxon-Mann-Whitney test and the permutation t test, except for the case of the uniform distribution. In the case of the logistic and exponential distribution the type I error rate for the test based on medians is slightly bigger than the desired 0.05.
 
-## Question 5: Recommendation on the use of the median test
+#______________________________________________________________________________
 
-Throughout this report, we observed that the (permutation) median test is a valid and powerful alternative to the Wilcoxon-Mann-Whitney test and the permutation t test.
+# Appendix 1 : QQ Plots
 
-Especially compared to the permutation t-test, we observed that the median test is more powerful for more heavy-tailed distributions, such as the t distribution at 3 degrees of freedom and the laplace distribution. This should not be surprising: the test statistic in the t-test is based on the difference in sample averages. The sample average, however, is not robust to outliers, leading to more variability in the test-statistic. Furthermore, for heavy-tailed distributions, the probability of randomly drawing outliers is higher. As a consequence, the power of the test will intuitively be lower for the same sample size compared to a test statistic based on the difference in sample medians for a heavy tailed distribution. This is because the median is robust to outliers.
-
-The same benefit described above applies to the Wilcoxon-Mann-Whitney test. However, the Wilcoxon-Mann-Whitney test may not provide good results in the case of many ties. Therefore, the median test based on a permutation strategy is recommended if the data consists of many ties in a heavy tailed distribution.
-
-## Question 6: Division of work
-
-We separately constructed the median test to make sure that it is as correct as possible, since it is the cornerstone of this homework. We then discussed and merged our solutions into one. Jonas wrote the code for the simulations per distribution, Toon extended them to include all sample sizes. The interpretation of the results was always a joint effort. For every code written by the other person, we both verified its correctness.
-
-## Appendix 1
-
-In this appendix, we present the Q-Q Plots of the first and second group for each considered distribution to verify whether the location-shift model holds.
-
-```{r, echo = FALSE}
-library(extraDistr) #Laplace distribution
-
-#----------------------------------------------------------------------------------
 
 #QQPlot for t3 distribution
 
@@ -767,20 +662,20 @@ set.seed(1234) #For reproductibility
 delta <- sqrt(3)/2 #delta = sqrt(variance)/2
 
 
-    Y1 <- rt(n, 3)
-    Y2 <- rt(n, 3) + delta
+Y1 <- rt(n, 3)
+Y2 <- rt(n, 3) + delta
 
-    # Create Q-Q plot
-    qqplot(Y1, Y2, main = "Q-Q Plot of for t3 distribution",
-           xlab = "Quantiles of group1", ylab = "Quantiles of group2",
-           pch = 19, col = "blue")
-    
-    # Add a diagonal line
-    abline(0, 1, col = "red", lty = 2, lwd = 2)
+# Create Q-Q plot
+qqplot(Y1, Y2, main = "Q-Q Plot of for t3 distribution",
+       xlab = "Quantiles of group1", ylab = "Quantiles of group2",
+       pch = 19, col = "blue")
+
+# Add a diagonal line
+abline(0, 1, col = "red", lty = 2, lwd = 2)
 
 
 #----------------------------------------------------------------------------------
-    
+
 #QQPlot for Exponential distribution
 
 set.seed(10234) #For reproductibility
@@ -789,40 +684,40 @@ set.seed(10234) #For reproductibility
 
 delta <- sqrt(1)/2 #delta = sqrt(variance)/2
 
-    Y1 <- rexp(n, rate = 1)
-    Y2 <- rexp(n, rate = 1)+delta
+Y1 <- rexp(n, rate = 1)
+Y2 <- rexp(n, rate = 1)+delta
 
-    
-    # Create Q-Q plot
-    qqplot(Y1, Y2, main = "Q-Q Plot of for exponential distribution",
-           xlab = "Quantiles of group1", ylab = "Quantiles of group2",
-           pch = 19, col = "blue")
-    
-    # Add a diagonal line
-    abline(0, 1, col = "red", lty = 2, lwd = 2)
-    
+
+# Create Q-Q plot
+qqplot(Y1, Y2, main = "Q-Q Plot of for exponential distribution",
+       xlab = "Quantiles of group1", ylab = "Quantiles of group2",
+       pch = 19, col = "blue")
+
+# Add a diagonal line
+abline(0, 1, col = "red", lty = 2, lwd = 2)
+
 
 
 #----------------------------------------------------------------------------------
 
-   
+
 #QQPlot for Laplace distribution
 
 set.seed(100234) #For reproductibility
 
 delta <- sqrt(2)/2 #delta = sqrt(variance)/2
 
-    Y1 <- rlaplace(n, mu = 0, sigma = 1)
-    Y2 <- rlaplace(n, mu = delta, sigma = 1)
+Y1 <- rlaplace(n, mu = 0, sigma = 1)
+Y2 <- rlaplace(n, mu = delta, sigma = 1)
 
-    # Create Q-Q plot
-    qqplot(Y1, Y2, main = "Q-Q Plot of for Laplace distribution",
-           xlab = "Quantiles of group1", ylab = "Quantiles of group2",
-           pch = 19, col = "blue")
-    
-    # Add a diagonal line
-    abline(0, 1, col = "red", lty = 2, lwd = 2)
-    
+# Create Q-Q plot
+qqplot(Y1, Y2, main = "Q-Q Plot of for Laplace distribution",
+       xlab = "Quantiles of group1", ylab = "Quantiles of group2",
+       pch = 19, col = "blue")
+
+# Add a diagonal line
+abline(0, 1, col = "red", lty = 2, lwd = 2)
+
 #----------------------------------------------------------------------------------
 
 # QQPlot for t5 distribution
@@ -832,16 +727,16 @@ set.seed(1000234) #For reproductibility
 delta <- sqrt(5/3)/2 #delta = sqrt(variance)/2
 
 
-    Y1 <- rt(n, 5)
-    Y2 <- rt(n, 5) + delta
+Y1 <- rt(n, 5)
+Y2 <- rt(n, 5) + delta
 
-    # Create Q-Q plot
-    qqplot(Y1, Y2, main = "Q-Q Plot of for t5 distribution",
-           xlab = "Quantiles of group1", ylab = "Quantiles of group2",
-           pch = 19, col = "blue")
-    
-    # Add a diagonal line
-    abline(0, 1, col = "red", lty = 2, lwd = 2)
+# Create Q-Q plot
+qqplot(Y1, Y2, main = "Q-Q Plot of for t5 distribution",
+       xlab = "Quantiles of group1", ylab = "Quantiles of group2",
+       pch = 19, col = "blue")
+
+# Add a diagonal line
+abline(0, 1, col = "red", lty = 2, lwd = 2)
 #----------------------------------------------------------------------------------
 
 # QQPlot for Logistic distribution
@@ -851,17 +746,17 @@ set.seed(10000234) #For reproductibility
 #variance = scale**2 * pi**2 / 3 
 delta <- sqrt(pi**2/3)/2 #delta = sqrt(variance)/2
 
-    Y1 <- rlogis(n, location=0, scale=1)
-    Y2 <- rlogis(n, location = delta, scale=1)
+Y1 <- rlogis(n, location=0, scale=1)
+Y2 <- rlogis(n, location = delta, scale=1)
 
-    # Create Q-Q plot
-    qqplot(Y1, Y2, main = "Q-Q Plot of for logistic distribution",
-           xlab = "Quantiles of group1", ylab = "Quantiles of group2",
-           pch = 19, col = "blue")
-    
-    # Add a diagonal line
-    abline(0, 1, col = "red", lty = 2, lwd = 2)
-    
+# Create Q-Q plot
+qqplot(Y1, Y2, main = "Q-Q Plot of for logistic distribution",
+       xlab = "Quantiles of group1", ylab = "Quantiles of group2",
+       pch = 19, col = "blue")
+
+# Add a diagonal line
+abline(0, 1, col = "red", lty = 2, lwd = 2)
+
 #----------------------------------------------------------------------------------
 
 # QQPlot for normal distribution
@@ -872,17 +767,17 @@ set.seed(100000234) #For reproductibility
 #variance = sqrt(sigma)
 delta <- sqrt(1)/2 #delta = sqrt(variance)/2
 
-    Y1 <- rnorm(n, 0, 1)
-    Y2 <- rnorm(n, delta, 1)
+Y1 <- rnorm(n, 0, 1)
+Y2 <- rnorm(n, delta, 1)
 
-    # Create Q-Q plot
-    qqplot(Y1, Y2, main = "Q-Q Plot of for normal distribution",
-           xlab = "Quantiles of group1", ylab = "Quantiles of group2",
-           pch = 19, col = "blue")
-    
-    # Add a diagonal line
-    abline(0, 1, col = "red", lty = 2, lwd = 2)
-    
+# Create Q-Q plot
+qqplot(Y1, Y2, main = "Q-Q Plot of for normal distribution",
+       xlab = "Quantiles of group1", ylab = "Quantiles of group2",
+       pch = 19, col = "blue")
+
+# Add a diagonal line
+abline(0, 1, col = "red", lty = 2, lwd = 2)
+
 #----------------------------------------------------------------------------------
 
 # QQPlot for uniform distribution
@@ -892,54 +787,14 @@ set.seed(1000000234) #For reproductibility
 #variance = 1/12 * (max-min)**2
 delta <- sqrt(1/12)/2 #delta = sqrt(variance)/2
 
-    Y1 <- runif(n, min=0, max=1)
-    Y2 <- runif(n, min=0, max=1)+delta
+Y1 <- runif(n, min=0, max=1)
+Y2 <- runif(n, min=0, max=1)+delta
 
-    # Create Q-Q plot
-    qqplot(Y1, Y2, main = "Q-Q Plot of for uniform distribution",
-           xlab = "Quantiles of group1", ylab = "Quantiles of group2",
-           pch = 19, col = "blue")
-    
-    # Add a diagonal line
-    abline(0, 1, col = "red", lty = 2, lwd = 2)
-    
+# Create Q-Q plot
+qqplot(Y1, Y2, main = "Q-Q Plot of for uniform distribution",
+       xlab = "Quantiles of group1", ylab = "Quantiles of group2",
+       pch = 19, col = "blue")
 
-```
+# Add a diagonal line
+abline(0, 1, col = "red", lty = 2, lwd = 2)
 
-## Appendix 2
-
-In this appendix, we present the results of the power simulation.
-
-```{r, echo = FALSE}
-results_Power
-```
-
-## Appendix 3
-
-In this appendix, we present the results of the Type I simulation.
-
-```{r, echo = FALSE}
-results_TypeI 
-```
-
-## Appendix 4
-
-In this appendix, we present the code used for the power simulation.
-
-```{r getlabels1, echo = FALSE}
-labs = "power_simulation"
-```
-
-```{r allcode, ref.label = labs, echo=TRUE, eval = FALSE}
-```
-
-## Appendix 5
-
-In this appendix, we present the code used for the Type I error rate simulation.
-
-```{r getlabels2, echo = FALSE}
-labs = "TypeI_simulation"
-```
-
-```{r allcode, ref.label = labs, echo=TRUE, eval = FALSE}
-```
